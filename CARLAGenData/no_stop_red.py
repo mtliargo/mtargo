@@ -4,7 +4,6 @@ Generate CARLA Data
 
 import argparse
 import logging
-import math
 import random
 import time
 import sys
@@ -13,17 +12,18 @@ from os.path import join
 import numpy as np
 
 carla_path = '/home/mli/CARLA_0.8.2'
-sys.path.insert(0, join(carla_path, 'PythonClient'))
+sys.path.insert(0, join(carla_path, 'PythonClient-client_side_agent'))
 
 from carla.client import make_carla_client
-from carla.sensor import Camera, Lidar
+from carla.sensor import Camera
 from carla.settings import CarlaSettings
 from carla.tcp import TCPConnectionError
 from carla.util import print_over_same_line
 
-random.seed(0)
+from carla.autopilot.autopilot import Autopilot
+from carla.autopilot.pilotconfiguration import ConfigAutopilot
 
-r2d = lambda x: x/math.pi*180
+random.seed(0)
 
 def parse_args():
     argparser = argparse.ArgumentParser(description=__doc__)
@@ -44,26 +44,6 @@ def parse_args():
         type=int,
         help='TCP port to listen to (default: 2000)')
     argparser.add_argument(
-        '-a', '--autopilot',
-        action='store_true',
-        default=True,
-        help='enable autopilot')
-    argparser.add_argument(
-        '-l', '--lidar',
-        action='store_true',
-        help='enable Lidar')
-    argparser.add_argument(
-        '-q', '--quality-level',
-        choices=['Low', 'Epic'],
-        type=lambda s: s.title(),
-        default='Epic',
-        help='graphics quality level, a lower level makes the simulation run considerably faster.')
-    # argparser.add_argument(
-    #     '-i', '--images-to-disk',
-    #     action='store_true',
-    #     dest='save_images_to_disk',
-    #     help='save images (and Lidar data if active) to disk')
-    argparser.add_argument(
         '--save_images_to_disk',
         default=True,
     )
@@ -75,22 +55,19 @@ def parse_args():
         help='Path to a "CarlaSettings.ini" file')
     
     argparser.add_argument('--x-res', type=int, default=2048)
-    argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen15')
-    argparser.add_argument('--n-episode', type=int, default=1)
+    argparser.add_argument('--y-res', type=int, default=1024)
+    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen2')
+    argparser.add_argument('--n-episode', type=int, default=140)
     argparser.add_argument('--n-frame', type=int, default=300)
     argparser.add_argument('--save-every-n-frames', type=int, default=10)
-    argparser.add_argument('--cam-fov', type=float, default=50)
-    argparser.add_argument('--cam-offset', nargs='+', type=float, default=[0.3, -0.10, 1.22])
-    argparser.add_argument('--cam-rotation', nargs='+', type=float, default=[r2d(-0.01), r2d(0.02), 0])
-
 
     return argparser.parse_args()
+
 
 def run_carla_client(args):
     number_of_episodes = args.n_episode
     frames_per_episode = args.n_frame
-    skip_frames = 30 # 100 # at 10 fps
+    skip_frames = 100 # at 10 fps
     weathers = list(range(number_of_episodes))
     # random.shuffle(weathers)
     weathers = [w % 14 + 1 for w in weathers]
@@ -105,6 +82,9 @@ def run_carla_client(args):
     # context manager makes sure the connection is always cleaned up on exit.
     with make_carla_client(args.host, args.port) as client:
         print('CarlaClient connected')
+
+        autopilot = Autopilot(ConfigAutopilot('Town01'))
+
 
         for episode in range(number_of_episodes):
             # Start a new episode.
@@ -123,7 +103,7 @@ def run_carla_client(args):
                     WeatherId=weathers[episode],
                     # WeatherId=random.randrange(14) + 1,
                     # WeatherId=random.choice([1, 3, 7, 8, 14]),
-                    QualityLevel=args.quality_level)
+                )
                 settings.randomize_seeds()
 
                 # Now we want to add a couple of cameras to the player vehicle.
@@ -133,41 +113,24 @@ def run_carla_client(args):
                 # The default camera captures RGB images of the scene.
                 camera0 = Camera('RGB')
                 # Set image resolution in pixels.
-                camera0.set(FOV=args.cam_fov)
                 camera0.set_image_size(args.x_res, args.y_res)
                 # Set its position relative to the car in meters.
-                camera0.set_position(*args.cam_offset)
-                camera0.set_rotation(*args.cam_rotation)
+                # camera0.set_position(0.30, 0, 1.30)
+                camera0.set_position(x=0, y=-0.06, z=1.65)
                 settings.add_sensor(camera0)
 
                 # Let's add another camera producing ground-truth depth.
                 camera1 = Camera('Depth', PostProcessing='Depth')
-                camera1.set(FOV=args.cam_fov)
                 camera1.set_image_size(args.x_res, args.y_res)
-                camera1.set_position(*args.cam_offset)
-                camera1.set_rotation(*args.cam_rotation)
+                # camera1.set_position(0.30, 0, 1.30)
+                camera1.set_position(x=0, y=-0.06, z=1.65)
                 settings.add_sensor(camera1)
 
                 camera2 = Camera('Seg', PostProcessing='SemanticSegmentation')
-                camera2.set(FOV=args.cam_fov)
                 camera2.set_image_size(args.x_res, args.y_res)
-                camera2.set_position(*args.cam_offset)
-                camera2.set_rotation(*args.cam_rotation)
+                # camera2.set_position(0.30, 0, 1.30)
+                camera2.set_position(x=0, y=-0.06, z=1.65)
                 settings.add_sensor(camera2)
-
-                if args.lidar:
-                    lidar = Lidar('Lidar32')
-                    lidar.set_position(0, 0, 2.50)
-                    lidar.set_rotation(0, 0, 0)
-                    lidar.set(
-                        Channels=32,
-                        Range=50,
-                        PointsPerSecond=100000,
-                        RotationFrequency=10,
-                        UpperFovLimit=10,
-                        LowerFovLimit=-30)
-                    settings.add_sensor(lidar)
-
             else:
 
                 # Alternatively, we can load these settings from a file.
@@ -183,7 +146,9 @@ def run_carla_client(args):
             # Choose one player start at random.
             number_of_player_starts = len(scene.player_start_spots)
             player_start = random.randrange(number_of_player_starts)
-
+            player_target = player_start
+            while player_target == player_start:
+                player_target = random.randrange(number_of_player_starts)
             # Notify the server that we want to start the episode at the
             # player_start index. This function blocks until the server is ready
             # to start the episode.
@@ -192,12 +157,6 @@ def run_carla_client(args):
 
             frame = 0
             save_frame_idx = 0
-
-            # extra_frames = 0
-            # last_control = None
-            # last_control_changed = 0
-            # while frame < skip_frames + frames_per_episode + extra_frames:
-
             # Iterate every frame in the episode.
             for frame in range(skip_frames + frames_per_episode):
                 # Read the data produced by the server this frame.
@@ -209,10 +168,6 @@ def run_carla_client(args):
                 # Save the images to disk if requested.
                 if args.save_images_to_disk and frame >= skip_frames \
                     and (frame - skip_frames) % args.save_every_n_frames == 0:
-                    # if last_control_changed < frame - args.save_every_n_frames:
-                    #     extra_frames += args.save_every_n_frames
-                    #     last_control_changed += args.save_every_n_frames
-                    # else:
                     save_frame_idx += 1
                     for name, measurement in sensor_data.items():
                         filename = args.out_filename_format.format(episode+1, name, save_frame_idx)
@@ -230,34 +185,37 @@ def run_carla_client(args):
                 # If we are in synchronous mode the server will pause the
                 # simulation until we send this control.
 
-                if not args.autopilot:
+                # if not args.autopilot:
 
-                    client.send_control(
-                        steer=random.uniform(-1.0, 1.0),
-                        throttle=0.5,
-                        brake=0.0,
-                        hand_brake=False,
-                        reverse=False)
+                #     client.send_control(
+                #         steer=random.uniform(-1.0, 1.0),
+                #         throttle=0.5,
+                #         brake=0.0,
+                #         hand_brake=False,
+                #         reverse=False)
 
-                else:
+                # else:
 
-                    # Together with the measurements, the server has sent the
-                    # control that the in-game autopilot would do this frame. We
-                    # can enable autopilot by sending back this control to the
-                    # server. We can modify it if wanted, here for instance we
-                    # will add some noise to the steer.
+                #     # Together with the measurements, the server has sent the
+                #     # control that the in-game autopilot would do this frame. We
+                #     # can enable autopilot by sending back this control to the
+                #     # server. We can modify it if wanted, here for instance we
+                #     # will add some noise to the steer.
 
-                    control = measurements.player_measurements.autopilot_control
-                    # if last_control:
-                    #     for v1, v2 in zip(control.values(), last_control.values()):
-                    #         if v1 != v2:
-                    #             last_control_changed = frame
-                    #             break
+                #     control = measurements.player_measurements.autopilot_control
+                #     # if last_control:
+                #     #     for v1, v2 in zip(control.values(), last_control.values()):
+                #     #         if v1 != v2:
+                #     #             last_control_changed = frame
+                #     #             break
 
-                    # control.steer += random.uniform(-0.1, 0.1)
-                    client.send_control(control)
+                #     control.steer += random.uniform(-0.1, 0.1)
+                #     client.send_control(control)
 
-                # frame += 1
+                control = autopilot.run_step(measurements, None,
+                                           scene.player_start_spots[player_target])
+                # control.steer += random.uniform(-0.1, 0.1)
+                client.send_control(control)
 
 def print_measurements(measurements):
     number_of_agents = len(measurements.non_player_agents)
