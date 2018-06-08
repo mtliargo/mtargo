@@ -76,8 +76,8 @@ def parse_args():
     
     argparser.add_argument('--x-res', type=int, default=2048)
     argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen15')
-    argparser.add_argument('--n-episode', type=int, default=1)
+    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen17')
+    argparser.add_argument('--n-episode', type=int, default=1400)
     argparser.add_argument('--n-frame', type=int, default=300)
     argparser.add_argument('--save-every-n-frames', type=int, default=10)
     argparser.add_argument('--cam-fov', type=float, default=50)
@@ -88,16 +88,30 @@ def parse_args():
     return argparser.parse_args()
 
 def run_carla_client(args):
-    number_of_episodes = args.n_episode
+    skip_frames = 100 # 100 # at 10 fps
+    # number_of_episodes = args.n_episode
+    # frames_per_episode = args.n_frame
+    
+    # weathers = list(range(number_of_episodes))
+    # # random.shuffle(weathers)
+    # weathers = [w % 14 + 1 for w in weathers]
+    # https://carla.readthedocs.io/en/latest/carla_settings/
+
+    n_weather = 14 # weathers starts from 1 
+    n_player_start_spots = 152
+
+    number_of_episodes = n_weather*n_player_start_spots
     frames_per_episode = args.n_frame
-    skip_frames = 30 # 100 # at 10 fps
-    weathers = list(range(number_of_episodes))
-    # random.shuffle(weathers)
-    weathers = [w % 14 + 1 for w in weathers]
+
+    weathers, start_spots = np.meshgrid(list(range(1, n_weather+1)), list(range(n_player_start_spots)))
+
+    weathers = weathers.flatten()
+    start_spots = start_spots.flatten()
 
     if not os.path.isdir(args.out_dir):
         os.makedirs(args.out_dir)
     np.savetxt(join(args.out_dir, 'weathers.txt'), weathers, fmt='%d')
+    np.savetxt(join(args.out_dir, 'start_spots.txt'), start_spots, fmt='%d')
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port. To create a connection we can use the `make_carla_client`
     # context manager, it creates a CARLA client object and starts the
@@ -181,9 +195,10 @@ def run_carla_client(args):
             scene = client.load_settings(settings)
 
             # Choose one player start at random.
-            number_of_player_starts = len(scene.player_start_spots)
-            player_start = random.randrange(number_of_player_starts)
+            # number_of_player_starts = len(scene.player_start_spots)
+            # player_start = random.randrange(number_of_player_starts)
 
+            player_start = start_spots[episode]
             # Notify the server that we want to start the episode at the
             # player_start index. This function blocks until the server is ready
             # to start the episode.
@@ -254,7 +269,7 @@ def run_carla_client(args):
                     #             last_control_changed = frame
                     #             break
 
-                    # control.steer += random.uniform(-0.1, 0.1)
+                    control.steer += random.uniform(-0.1, 0.1)
                     client.send_control(control)
 
                 # frame += 1

@@ -94,7 +94,7 @@ labels = [
 ]
 
 cm = np.array([l.color for l in labels])
-carla2cityscape = np.array([0, 11, 13, 0, 24, 17, 7, 7, 8, 21, 26, 12, 20])
+carla2cityscape = np.array([0, 11, 13, 0, 24, 17, 7, 7, 8, 21, 26, 12, 20, 1]) # the last 1 is not in the original set
 
 
 def c2clabel(carla_label):
