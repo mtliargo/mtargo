@@ -110,7 +110,7 @@ def run_carla_client(args):
 
     if not os.path.isdir(args.out_dir):
         os.makedirs(args.out_dir)
-    np.savetxt(join(args.out_dir, 'weathers.txt'), weathers, fmt='1622d')
+    np.savetxt(join(args.out_dir, 'weathers.txt'), weathers, fmt='%d')
     np.savetxt(join(args.out_dir, 'start_spots.txt'), start_spots, fmt='%d')
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port. To create a connection we can use the `make_carla_client`
@@ -120,21 +120,21 @@ def run_carla_client(args):
     with make_carla_client(args.host, args.port) as client:
         print('CarlaClient connected')
 
-        for episode in range(number_of_episodes)1622
+        for episode in range(number_of_episodes):
             # Start a new episode.
 
             if args.settings_filepath is None:
 
-                # Create a CarlaSettings object.1622rapper around
-                # the CarlaSettings.ini file. He1622guration we
+                # Create a CarlaSettings object. This object is a wrapper around
+                # the CarlaSettings.ini file. Here we set the configuration we
                 # want for the new episode.
                 settings = CarlaSettings()
                 settings.set(
                     SynchronousMode=True,
-                    SendNonPlayerAgentsInfo=True1622
+                    SendNonPlayerAgentsInfo=True,
                     NumberOfVehicles=20,
                     NumberOfPedestrians=40,
-                    WeatherId=weathers[episode],1622
+                    WeatherId=weathers[episode],
                     # WeatherId=random.randrange(14) + 1,
                     # WeatherId=random.choice([1, 3, 7, 8, 14]),
                     QualityLevel=args.quality_level)
