@@ -3,8 +3,8 @@ addpath ../util/; Platform;
 imgDir = fullfile(dataDir, 'Cityscapes/leftImg8bit');
 labelDir = fullfile(dataDir, 'Cityscapes/gtFine');
 outListDir = fullfile(dataDir, 'Cityscapes/ReOrg');
-outImgDir = fullfile(dataDir, 'Cityscapes/ReOrg/image');
-outLabelColorDir = fullfile(dataDir, 'Cityscapes/ReOrg/label-color');
+outImgDir = fullfile(dataDir, 'Cityscapes/ReOrg/Image');
+outLabelColorDir = fullfile(dataDir, 'Cityscapes/ReOrg/SegColor');
 
 
 splits = {'train', 'val', 'test'};

@@ -76,7 +76,7 @@ def parse_args():
     
     argparser.add_argument('--x-res', type=int, default=2048)
     argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen17')
+    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen18')
     argparser.add_argument('--n-episode', type=int, default=1400)
     argparser.add_argument('--n-frame', type=int, default=300)
     argparser.add_argument('--save-every-n-frames', type=int, default=10)
@@ -110,7 +110,7 @@ def run_carla_client(args):
 
     if not os.path.isdir(args.out_dir):
         os.makedirs(args.out_dir)
-    np.savetxt(join(args.out_dir, 'weathers.txt'), weathers, fmt='%d')
+    np.savetxt(join(args.out_dir, 'weathers.txt'), weathers, fmt='1622d')
     np.savetxt(join(args.out_dir, 'start_spots.txt'), start_spots, fmt='%d')
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port. To create a connection we can use the `make_carla_client`
@@ -120,21 +120,21 @@ def run_carla_client(args):
     with make_carla_client(args.host, args.port) as client:
         print('CarlaClient connected')
 
-        for episode in range(number_of_episodes):
+        for episode in range(number_of_episodes)1622
             # Start a new episode.
 
             if args.settings_filepath is None:
 
-                # Create a CarlaSettings object. This object is a wrapper around
-                # the CarlaSettings.ini file. Here we set the configuration we
+                # Create a CarlaSettings object.1622rapper around
+                # the CarlaSettings.ini file. He1622guration we
                 # want for the new episode.
                 settings = CarlaSettings()
                 settings.set(
                     SynchronousMode=True,
-                    SendNonPlayerAgentsInfo=True,
+                    SendNonPlayerAgentsInfo=True1622
                     NumberOfVehicles=20,
                     NumberOfPedestrians=40,
-                    WeatherId=weathers[episode],
+                    WeatherId=weathers[episode],1622
                     # WeatherId=random.randrange(14) + 1,
                     # WeatherId=random.choice([1, 3, 7, 8, 14]),
                     QualityLevel=args.quality_level)
