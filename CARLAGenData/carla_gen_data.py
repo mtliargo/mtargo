@@ -76,7 +76,7 @@ def parse_args():
     
     argparser.add_argument('--x-res', type=int, default=2048)
     argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/exp/CARLA_gen18')
+    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/Exp/CARLA_gen18')
     argparser.add_argument('--n-episode', type=int, default=1400)
     argparser.add_argument('--n-frame', type=int, default=300)
     argparser.add_argument('--save-every-n-frames', type=int, default=10)
@@ -120,7 +120,7 @@ def run_carla_client(args):
     with make_carla_client(args.host, args.port) as client:
         print('CarlaClient connected')
 
-        for episode in range(number_of_episodes):
+        for episode in range(924, number_of_episodes):
             # Start a new episode.
 
             if args.settings_filepath is None:
@@ -199,6 +199,7 @@ def run_carla_client(args):
             # player_start = random.randrange(number_of_player_starts)
 
             player_start = start_spots[episode]
+
             # Notify the server that we want to start the episode at the
             # player_start index. This function blocks until the server is ready
             # to start the episode.
