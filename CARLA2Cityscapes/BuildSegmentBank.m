@@ -1,4 +1,4 @@
-addpath util/; Platform;
+addpath ../util/; Platform;
 addpath dbcode/;
 
 runStr = 'bank1';

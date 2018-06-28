@@ -1,7 +1,7 @@
-addpath ../util/; Platform;
+addpath ../../util/; Platform;
 addpath ../dbcode/;
 
-runStr = 'test3';
+runStr = 'test4';
 
 minSegSize = 256; % at 512x1024
 sizes = [1024, 512, 256]; % for SegColor
@@ -10,7 +10,7 @@ outSize = [256 512]; % for SegList
 classColor = uint8(dlmread('../dbcode/classColor.txt'));
 nClass = size(classColor, 1);
 
-seqDir = fullfile(dataDir, 'Exp/CARLA_gen17/e000001');
+seqDir = fullfile(dataDir, 'Exp/CARLA_gen18/e000001');
 outDir = mkdir2(fullfile(dataDir, 'Exp/C2C', runStr));
 segColorDir = fullfile(outDir, 'SegColor');
 segColorOriginalSize = [segColorDir num2str(sizes(1), '-%d')];

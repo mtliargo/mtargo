@@ -1,7 +1,7 @@
-addpath ../util/; Platform;
+addpath ../../util/; Platform;
 
-runStr = 'test3';
-nTestMax = 1;
+runStr = 'test4';
+nTestMax = 10;
 bVisual = 1;
 topK = 1;
 
@@ -27,7 +27,6 @@ for i = 1:nTest
         imwrite(img, fullfile(visDir, [testList{i}(1:end-3) 'jpg']));
     end
 end
-
 
 
 

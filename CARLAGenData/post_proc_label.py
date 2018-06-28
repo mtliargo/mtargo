@@ -4,6 +4,10 @@ http://carla.readthedocs.io/en/latest/cameras_and_sensors/#camera-semantic-segme
 
 '''
 
+import sys
+sys.path.insert(0, '../util')
+import platform_config as pc
+
 import os, glob
 import numpy as np
 from os.path import join
@@ -12,6 +16,8 @@ from skimage import measure
 import cv2
 # import matplotlib.pyplot as plt
 from cityscapes import c2clabel 
+
+data_dir = pc.data_dir
 
 def proc_sky(img):
     # none_mask = img == 0
@@ -52,48 +58,52 @@ def proc_car(img):
     img[new_mask] = 10
     return img
 
-data_dir = '/home/mli/Data'
+data_dir = pc.data_dir
 
-## single mode
-in_dir = join(data_dir, 'Exp/CARLA_gen17/e000001/Seg')
-out_dir = join(data_dir, 'Exp/CARLA_gen17/e000001/SegColor')
-mask_file = join(data_dir, 'Exp/CARLA_gen17/ego-vehicle.png')
+single_mode = 1
 
-if not os.path.isdir(out_dir):
-    os.makedirs(out_dir)
+if single_mode:
+    ## single mode
+    in_dir = join(data_dir, 'Exp/CARLA_gen19/e000001/Seg')
+    out_dir = join(data_dir, 'Exp/CARLA_gen19/e000001/SegColor')
+    mask_file = join(data_dir, 'Exp/CARLA_gen19/ego-vehicle.png')
 
-mask = np.array(Image.open(mask_file), dtype=bool)
+    if not os.path.isdir(out_dir):
+        os.makedirs(out_dir)
 
-files = glob.glob(join(in_dir, '*.png'))
-for f in files:
-    img = np.array(Image.open(f))
-    img = img[:, :, 0]
-    img[mask] = 13
-    img = proc_sky(img)
-    img = proc_car(img) 
-    color_seg = c2clabel(img)
-    Image.fromarray(color_seg).save(join(out_dir, os.path.basename(f)))
+    mask = np.array(Image.open(mask_file), dtype=bool)
 
+    files = glob.glob(join(in_dir, '*.png'))
+    for f in files:
+        img = np.array(Image.open(f))
+        img = img[:, :, 0]
+        img[mask] = 13
+        img = proc_sky(img)
+        img = proc_car(img) 
+        color_seg = c2clabel(img)
+        Image.fromarray(color_seg).save(join(out_dir, os.path.basename(f)))
+
+else:
 ## batch mode
-# mask_file = join(data_dir, 'Exp/CARLA_gen17/ego-vehicle.png')
-# mask = np.array(Image.open(mask_file), dtype=bool)
+    mask_file = join(data_dir, 'Exp/CARLA_gen19/ego-vehicle.png')
+    mask = np.array(Image.open(mask_file), dtype=bool)
 
-# seqs = glob.glob(join(data_dir, 'Exp/CARLA_gen17/e*'))
-# seqs = list(filter(lambda s: os.path.isdir(s), seqs))
+    seqs = glob.glob(join(data_dir, 'Exp/CARLA_gen19/e*'))
+    seqs = list(filter(lambda s: os.path.isdir(s), seqs))
 
-# for s in seqs:
-#     in_dir = join(s, 'Seg')
-#     out_dir = join(s, 'SegColor')
-    
-#     if not os.path.isdir(out_dir):
-#         os.makedirs(out_dir)
+    for s in seqs:
+        in_dir = join(s, 'Seg')
+        out_dir = join(s, 'SegColor')
+        
+        if not os.path.isdir(out_dir):
+            os.makedirs(out_dir)
 
-#     files = glob.glob(join(in_dir, '*.png'))
-#     for f in files:
-#         img = np.array(Image.open(f))
-#         img = img[:, :, 0]
-#         img[mask] = 13
-#         img = proc_sky(img)
-#         img = proc_car(img)
-#         color_seg = c2clabel(img)
-#         Image.fromarray(color_seg).save(join(out_dir, os.path.basename(f)))
+        files = glob.glob(join(in_dir, '*.png'))
+        for f in files:
+            img = np.array(Image.open(f))
+            img = img[:, :, 0]
+            img[mask] = 13
+            img = proc_sky(img)
+            img = proc_car(img)
+            color_seg = c2clabel(img)
+            Image.fromarray(color_seg).save(join(out_dir, os.path.basename(f)))

@@ -10,3 +10,9 @@ elif hostname == 'MT1080':
     SSD_dir = r'C:\Data'
 else:
     raise Exception('Please setup the correct path on this machine.')
+
+import os
+def mkdir2(path):
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    return path
