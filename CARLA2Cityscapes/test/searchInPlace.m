@@ -35,19 +35,15 @@ for c = 1:length(classList)
     end
    
     for i = 1:nThisClass
-        maxIntersect = 0;
+        maxIoU = 0;
         for j = 1:bankSize
             itsc = thisClassMask(:, :, i) & bankMask(:, :, j);
-            itsc = sum(itsc(:));
-            if itsc > maxIntersect
-                maxIntersect = itsc;
-                u = thisClassMask(:, :, i) | bankMask(:, :, j);
-                thisIoU = itsc / sum(u(:));
-                if thisIoU > minIoU
-                    iou(thisClass(i), 1) = thisIoU;
-                    match{thisClass(i), 1} = bankMask(:, :, j);
-                    source(thisClass(i), 1) = bankSource(j);
-                end
+            u = thisClassMask(:, :, i) | bankMask(:, :, j);
+            thisIoU = sum(itsc(:)) / sum(u(:));
+            if thisIoU > max(minIoU, maxIoU)
+                iou(thisClass(i), 1) = thisIoU;
+                match{thisClass(i), 1} = bankMask(:, :, j);
+                source(thisClass(i), 1) = bankSource(j);
             end
         end
     end

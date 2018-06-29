@@ -4,7 +4,7 @@ from os.path import join
 from PIL import Image
 
 data_dir = '/home/mli/Data'
-in_file = join(data_dir, 'Exp/CARLA_gen18/e000045/Seg/00000006.png')
+in_file = join(data_dir, 'Exp/CARLA_gen19/e000015/Seg/00000001.png')
 out_file = join(data_dir, 'Exp/CARLA_gen19/ego-vehicle.png')
 
 

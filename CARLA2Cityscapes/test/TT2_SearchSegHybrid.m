@@ -23,7 +23,7 @@ for i = 1:nTest
     [match, source, score] = searchInPlaceHybrid(mask, classIdx, segBankDir, topK);
     save(fullfile(matchDir, testList{i}), 'match', 'source', 'score');
     if bVisual
-        img = visSearch(mask, source, imgBankDir);
+        img = visSearch(mask, classIdx, source, imgBankDir);
         imwrite(img, fullfile(visDir, [testList{i}(1:end-3) 'jpg']));
     end
 end
