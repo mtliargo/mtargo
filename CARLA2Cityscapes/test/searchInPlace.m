@@ -41,6 +41,7 @@ for c = 1:length(classList)
             u = thisClassMask(:, :, i) | bankMask(:, :, j);
             thisIoU = sum(itsc(:)) / sum(u(:));
             if thisIoU > max(minIoU, maxIoU)
+                maxIoU = thisIoU;
                 iou(thisClass(i), 1) = thisIoU;
                 match{thisClass(i), 1} = bankMask(:, :, j);
                 source(thisClass(i), 1) = bankSource(j);

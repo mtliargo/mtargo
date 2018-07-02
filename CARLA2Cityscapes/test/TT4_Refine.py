@@ -10,7 +10,7 @@
 
 from __future__ import division
 
-run_str = 'test5'
+run_str = 'test6'
 n_test_max = 30
 
 data_dir = '/home/mli/Data'

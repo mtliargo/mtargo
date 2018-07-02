@@ -24,16 +24,19 @@ end
 testList = dir(fullfile(segListDir, '*.mat'));
 testList = {testList.name};
 nTest = min(nTestMax, length(testList));
-parfor i = 1:nTest
+for i = 1:nTest
     ldata = load(fullfile(segListDir, testList{i}));
     mask = ldata.mask;
     classIdx = ldata.classIdx;
     [match, source, score] = searchInPlace(mask, classIdx, segBankDir, topK);
-    savest = struct;
-    savest.match = match;
-    savest.source = source;
-    savest.score = score;
-    parsave(fullfile(matchDir, testList{i}), savest);
+    save(fullfile(matchDir, testList{i}), 'match', 'source', 'score');
+    
+%     savest = struct;
+%     savest.match = match;
+%     savest.source = source;
+%     savest.score = score;
+%     parsave(fullfile(matchDir, testList{i}), savest);
+    
     if bVisual
         [img, orgImgs] = visSearch(mask, classIdx, match, source, imgBankDir);
         imwrite(img, fullfile(visDir, [testList{i}(1:end-3) 'jpg']));

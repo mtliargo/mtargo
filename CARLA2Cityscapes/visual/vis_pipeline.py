@@ -7,7 +7,7 @@ from os.path import join, basename
 from html4vision import Col, imagetable
 
 out_dir = mkdir2(join(data_dir, 'Exp/C2C/Visual'))
-exp_name = 'test5'
+exp_name = 'test6'
 # exp_name = basename(__file__)[:-3]
 
 
@@ -48,8 +48,8 @@ cols = [
     Col('img', 'Building 1 Source', building1_source, sel),    
 ]
 
-out_path = join('', exp_name + '.html')
+out_path = join(out_dir, exp_name + '.html')
 
-imagetable(cols, out_path, exp_name, imsize=(512, 256), interactive=True)
+imagetable(cols, out_path, exp_name, imsize=(512, 256), interactive=True, pathrep=(join(data_dir, 'Exp'), '../..'))
 
 

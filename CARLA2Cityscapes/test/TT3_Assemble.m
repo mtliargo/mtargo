@@ -1,7 +1,7 @@
 addpath ../../util/; Platform;
 addpath ../dbcode/;
 
-runStr = 'test5';
+runStr = 'test6';
 nTestMax = 30;
 inSize = 256;
 outSize = 512;
