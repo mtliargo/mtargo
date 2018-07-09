@@ -1,14 +1,24 @@
-addpath ../util/; Platform;
+addpath ../../util/; Platform;
 
 imgDir = fullfile(dataDir, 'Cityscapes/leftImg8bit');
 labelDir = fullfile(dataDir, 'Cityscapes/gtFine');
 outListDir = fullfile(dataDir, 'Cityscapes/ReOrg');
 outImgDir = fullfile(dataDir, 'Cityscapes/ReOrg/Image');
-outLabelColorDir = fullfile(dataDir, 'Cityscapes/ReOrg/SegColor');
-
+outLabelColor35Dir = fullfile(dataDir, 'Cityscapes/ReOrg/SegColor35');
+outLabelColor20Dir = fullfile(dataDir, 'Cityscapes/ReOrg/SegColor20');
 
 splits = {'train', 'val', 'test'};
 sizes = [1024, 512, 256, 128, 64];
+
+ldata = load('CityscapesClasses.mat');
+cc = ldata.CityscapesClasses;
+
+colors35 = double(cell2mat({cc.color}'))/255;
+
+sel = ismember([cc.trainId], 0:18);
+ccTrain = cc(sel);
+colors20 = cell2mat({ccTrain.color}');
+colors20 = double([colors20; 0 0 0])/255;
 
 parfor s = 1:length(splits)
     cities = dir(fullfile(imgDir, splits{s}));
@@ -34,14 +44,21 @@ parfor s = 1:length(splits)
             outDirThis = mkdir2(fullfile([outImgDir num2str(sizes(1), '-%d')], splits{s}));
             inNameThis = fullfile(inDirThis, [fileNames{i} '_leftImg8bit.png']);
             img = imread(inNameThis);
-            copyfile(inNameThis, fullfile(outDirThis, [baseName '.png']));
+            copyfile(inNameThis, fullfile(outDirThis, [baseName '.png'])); 
             
             if ~strcmp(splits{s}, 'test') 
                 inDirThis = fullfile(labelDir, splits{s}, cities{c});
-                outDirThis = mkdir2(fullfile([outLabelColorDir num2str(sizes(1), '-%d')], splits{s}));
-                inNameThis = fullfile(inDirThis, [fileNames{i} '_gtFine_color.png']);
-                imgLabel = imread(inNameThis);
-                copyfile(inNameThis, fullfile(outDirThis, [baseName '.png']));
+                outDirThis = mkdir2(fullfile([outLabelColor35Dir num2str(sizes(1), '-%d')], splits{s}));
+                inNameThis = fullfile(inDirThis, [fileNames{i} '_gtFine_labelIds.png']);
+                imgLabel35 = imread(inNameThis);
+                imwrite(imgLabel35, colors35, fullfile(outDirThis, [baseName '.png']));   
+                
+                inDirThis = fullfile(labelDir, splits{s}, cities{c});
+                outDirThis = mkdir2(fullfile([outLabelColor20Dir num2str(sizes(1), '-%d')], splits{s}));
+                inNameThis = fullfile(inDirThis, [fileNames{i} '_gtFine_labelTrainIds.png']);
+                imgLabel20 = imread(inNameThis);
+                imgLabel20(imgLabel20 == 255) = 19;
+                imwrite(imgLabel20, colors20, fullfile(outDirThis, [baseName '.png']));             
             end
 
             for z = 2:length(sizes)
@@ -50,9 +67,13 @@ parfor s = 1:length(splits)
                 imwrite(imgResize, fullfile(outDirThis, [baseName '.png']));
 
                 if ~strcmp(splits{s}, 'test') 
-                    imgLabelResize = imresize(imgLabel, [sizes(z) 2*sizes(z)], 'nearest');
-                    outDirThis = mkdir2(fullfile([outLabelColorDir num2str(sizes(z), '-%d')], splits{s}));
-                    imwrite(imgLabelResize, fullfile(outDirThis, [baseName '.png']));
+                    imgLabel35Resize = imresize(imgLabel35, [sizes(z) 2*sizes(z)], 'nearest');
+                    outDirThis = mkdir2(fullfile([outLabelColor35Dir num2str(sizes(z), '-%d')], splits{s}));
+                    imwrite(imgLabel35Resize, colors35, fullfile(outDirThis, [baseName '.png']));
+                    
+                    imgLabel20Resize = imresize(imgLabel20, [sizes(z) 2*sizes(z)], 'nearest');
+                    outDirThis = mkdir2(fullfile([outLabelColor20Dir num2str(sizes(z), '-%d')], splits{s}));
+                    imwrite(imgLabel20Resize, colors20, fullfile(outDirThis, [baseName '.png']));                   
                 end
             end
         end
