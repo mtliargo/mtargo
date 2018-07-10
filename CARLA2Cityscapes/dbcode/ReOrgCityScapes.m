@@ -1,5 +1,8 @@
 addpath ../../util/; Platform;
 
+% may need to run this first
+% python "${CITYSCAPES_ROOT}/cityscapesscripts/preparation/createTrainIdLabelImgs.py"
+
 imgDir = fullfile(dataDir, 'Cityscapes/leftImg8bit');
 labelDir = fullfile(dataDir, 'Cityscapes/gtFine');
 outListDir = fullfile(dataDir, 'Cityscapes/ReOrg');
