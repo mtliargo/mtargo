@@ -20,8 +20,8 @@ colors35 = double(cell2mat({cc.color}'))/255;
 
 sel = ismember([cc.trainId], 0:18);
 ccTrain = cc(sel);
-colors20 = cell2mat({ccTrain.color}');
-colors20 = double([colors20; 0 0 0])/255;
+colors19 = cell2mat({ccTrain.color}');
+colors20 = double([colors19; 0 0 0])/255;
 
 parfor s = 1:length(splits)
     cities = dir(fullfile(imgDir, splits{s}));
