@@ -96,6 +96,8 @@ labels = [
 cm = np.array([l.color for l in labels])
 carla2cityscape = np.array([0, 11, 13, 0, 24, 17, 7, 7, 8, 21, 26, 12, 20, 1, 23]) # the last 2 are not in the original set
 
+cm_train = np.array([l.color for l in labels if l.trainId >= 0 and l.trainId < 255])
+cm_train = np.vstack((cm_train, [0, 0, 0]))
 
 def c2clabel(carla_label):
     mapped = carla2cityscape[carla_label]
@@ -104,3 +106,11 @@ def c2clabel(carla_label):
     b = cm[mapped, 2]
     seg_color = np.stack((r,g,b), 2).astype(np.uint8)
     return seg_color
+
+def c2clabelfromrgb(seg_color):
+    seg_color = np.array(seg_color)
+    index_map = np.zeros(seg_color.shape[:-1], dtype=np.uint8)
+    n_class = cm_train.shape[0]
+    for c in range(n_class):
+        index_map[(seg_color[:, :, 0] == cm_train[c, 0]) & (seg_color[:, :, 1] == cm_train[c, 1]) & (seg_color[:, :, 2] == cm_train[c, 2])] = c
+    return index_map
