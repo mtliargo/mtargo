@@ -76,7 +76,7 @@ def parse_args():
     
     argparser.add_argument('--x-res', type=int, default=2048)
     argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='D:/Data/Exp/CARLA_vid')
+    argparser.add_argument('--out-dir', type=str, default='D:/Data/Exp/CARLA_debug')
     argparser.add_argument('--n-episode', type=int, default=1400)
     argparser.add_argument('--n-frame', type=int, default=300)
     argparser.add_argument('--save-every-n-frames', type=int, default=1)
@@ -98,7 +98,8 @@ def run_carla_client(args):
     # https://carla.readthedocs.io/en/latest/carla_settings/
 
     n_weather = 14 # weathers starts from 1 
-    n_player_start_spots = 152
+    n_player_start_spots = 152 # Town01
+    # n_player_start_spots = 83 # Town02
 
     number_of_episodes = n_weather*n_player_start_spots
     frames_per_episode = args.n_frame
@@ -197,7 +198,7 @@ def run_carla_client(args):
             # Choose one player start at random.
             # number_of_player_starts = len(scene.player_start_spots)
             # player_start = random.randrange(number_of_player_starts)
-
+            print(len(scene.player_start_spots))
             player_start = start_spots[episode]
 
             # Notify the server that we want to start the episode at the
