@@ -4,9 +4,8 @@ http://carla.readthedocs.io/en/latest/cameras_and_sensors/#camera-semantic-segme
 
 '''
 
-import sys
-sys.path.insert(0, '../util')
-import platform_config as pc
+import sys; sys.path.insert(0, '../util')
+from platform_config import data_dir, mkdir2
 
 import os, glob
 import numpy as np
@@ -16,8 +15,6 @@ from skimage import measure
 import cv2
 # import matplotlib.pyplot as plt
 from cityscapes import c2clabel 
-
-data_dir = pc.data_dir
 
 def proc_sky(img):
     # none_mask = img == 0
@@ -58,18 +55,13 @@ def proc_car(img):
     img[new_mask] = 10
     return img
 
-data_dir = pc.data_dir
-
 single_mode = 1
 
 if single_mode:
     ## single mode
-    in_dir = join(data_dir, 'Exp/CARLA_gen19/e000001/Seg')
-    out_dir = join(data_dir, 'Exp/CARLA_gen19/e000001/SegColor')
-    mask_file = join(data_dir, 'Exp/CARLA_gen19/ego-vehicle.png')
-
-    if not os.path.isdir(out_dir):
-        os.makedirs(out_dir)
+    in_dir = join(data_dir, 'Exp/CARLA_vid/e000003/Seg')
+    out_dir = mkdir2(join(data_dir, 'Exp/CARLA_vid/e000003/SegColor'))
+    mask_file = join(data_dir, 'Exp/CARLA_vid/ego-vehicle.png')
 
     mask = np.array(Image.open(mask_file), dtype=bool)
 
@@ -85,10 +77,10 @@ if single_mode:
 
 else:
 ## batch mode
-    mask_file = join(data_dir, 'Exp/CARLA_gen19/ego-vehicle.png')
+    mask_file = join(data_dir, 'Exp/CARLA_vid/ego-vehicle.png')
     mask = np.array(Image.open(mask_file), dtype=bool)
 
-    seqs = glob.glob(join(data_dir, 'Exp/CARLA_gen19/e*'))
+    seqs = glob.glob(join(data_dir, 'Exp/CARLA_vid/e*'))
     seqs = list(filter(lambda s: os.path.isdir(s), seqs))
 
     for s in seqs:

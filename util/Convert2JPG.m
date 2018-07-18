@@ -1,4 +1,4 @@
-addpath ../../util/; Platform;
+Platform;
 
 inDir = fullfile(dataDir, 'Cityscapes/ReOrg/Image-512');
 outDir = mkdir2([inDir '-JPG']);
