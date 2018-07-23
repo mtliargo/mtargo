@@ -59,8 +59,8 @@ single_mode = 1
 
 if single_mode:
     ## single mode
-    in_dir = join(data_dir, 'Exp/CARLA_vid/e000003/Seg')
-    out_dir = mkdir2(join(data_dir, 'Exp/CARLA_vid/e000003/SegColor'))
+    in_dir = join(data_dir, 'Exp/CARLA_vid/e000003/SegRaw')
+    out_dir = mkdir2(join(data_dir, 'Exp/CARLA_vid/e000003/Seg'))
     mask_file = join(data_dir, 'Exp/CARLA_vid/ego-vehicle.png')
 
     mask = np.array(Image.open(mask_file), dtype=bool)
@@ -84,8 +84,8 @@ else:
     seqs = list(filter(lambda s: os.path.isdir(s), seqs))
 
     for s in seqs:
-        in_dir = join(s, 'Seg')
-        out_dir = join(s, 'SegColor')
+        in_dir = join(s, 'SegRaw')
+        out_dir = join(s, 'Seg')
         
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)

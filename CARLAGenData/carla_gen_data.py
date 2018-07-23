@@ -76,10 +76,10 @@ def parse_args():
     
     argparser.add_argument('--x-res', type=int, default=2048)
     argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/Exp/CARLA_gen19')
-    argparser.add_argument('--n-episode', type=int, default=1400)
-    argparser.add_argument('--n-frame', type=int, default=300)
-    argparser.add_argument('--save-every-n-frames', type=int, default=10)
+    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/Exp/CARLA_gen20')
+    argparser.add_argument('--n-episode', type=int, default=8)
+    argparser.add_argument('--n-frame', type=int, default=200000)
+    argparser.add_argument('--save-every-n-frames', type=int, default=20)
     argparser.add_argument('--cam-fov', type=float, default=50)
     argparser.add_argument('--cam-offset', nargs='+', type=float, default=[0.3, -0.10, 1.22], help='x y z')
     argparser.add_argument('--cam-rotation', nargs='+', type=float, default=[r2d(-0.025), r2d(0.02), 0], help='pitch yaw roll')
@@ -89,24 +89,32 @@ def parse_args():
 
 def run_carla_client(args):
     skip_frames = 100 # 100 # at 10 fps
-    # number_of_episodes = args.n_episode
-    # frames_per_episode = args.n_frame
-    
+    number_of_episodes = args.n_episode
+    frames_per_episode = args.n_frame
+
+    # n_weather = 14 # weathers starts from 1 
+    n_player_start_spots = 152
+
+    weathers = number_of_episodes*[2] # CloudyNoon
+    start_spots = list(range(n_player_start_spots))
+    random.shuffle(start_spots)
+    assert number_of_episodes < n_player_start_spots
+    start_spots = start_spots[:number_of_episodes]
+
     # weathers = list(range(number_of_episodes))
     # # random.shuffle(weathers)
     # weathers = [w % 14 + 1 for w in weathers]
     # https://carla.readthedocs.io/en/latest/carla_settings/
 
-    n_weather = 14 # weathers starts from 1 
-    n_player_start_spots = 152
 
-    number_of_episodes = n_weather*n_player_start_spots
-    frames_per_episode = args.n_frame
 
-    weathers, start_spots = np.meshgrid(list(range(1, n_weather+1)), list(range(n_player_start_spots)))
+    # number_of_episodes = n_weather*n_player_start_spots
+    # frames_per_episode = args.n_frame
 
-    weathers = weathers.flatten()
-    start_spots = start_spots.flatten()
+    # weathers, start_spots = np.meshgrid(list(range(1, n_weather+1)), list(range(n_player_start_spots)))
+
+    # weathers = weathers.flatten()
+    # start_spots = start_spots.flatten()
 
     if not os.path.isdir(args.out_dir):
         os.makedirs(args.out_dir)
@@ -162,7 +170,7 @@ def run_carla_client(args):
                 camera1.set_rotation(*args.cam_rotation)
                 settings.add_sensor(camera1)
 
-                camera2 = Camera('Seg', PostProcessing='SemanticSegmentation')
+                camera2 = Camera('SegRaw', PostProcessing='SemanticSegmentation')
                 camera2.set(FOV=args.cam_fov)
                 camera2.set_image_size(args.x_res, args.y_res)
                 camera2.set_position(*args.cam_offset)
