@@ -48,7 +48,7 @@ Label = namedtuple( 'Label' , [
 # A list of all labels
 #--------------------------------------------------------------------------------
 
-# Please adapt the train IDs as appropriate for your approach.
+# Please adapt the train IDs as appropriate for your approach.,
 # Note that you might want to ignore labels with ID 255 during training.
 # Further note that the current train IDs are only a suggestion. You can use whatever you like.
 # Make sure to provide your results using the original IDs and not the training IDs.
@@ -95,6 +95,8 @@ labels = [
 
 cm = np.array([l.color for l in labels])
 carla2cityscape = np.array([0, 11, 13, 0, 24, 17, 7, 7, 8, 21, 26, 12, 20, 1, 23]) # the last 2 are not in the original set
+trainId = np.array([l.trainId if l.trainId >= 0 and l.trainId < 255 else 19 for l in labels])
+
 
 cm_train = np.array([l.color for l in labels if l.trainId >= 0 and l.trainId < 255])
 cm_train = np.vstack((cm_train, [0, 0, 0]))
@@ -114,3 +116,6 @@ def c2clabelfromrgb(seg_color):
     for c in range(n_class):
         index_map[(seg_color[:, :, 0] == cm_train[c, 0]) & (seg_color[:, :, 1] == cm_train[c, 1]) & (seg_color[:, :, 2] == cm_train[c, 2])] = c
     return index_map
+
+def c2trainid(carla_label):
+    return trainId[carla2cityscape[carla_label]]

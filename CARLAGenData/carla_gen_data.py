@@ -76,8 +76,8 @@ def parse_args():
     
     argparser.add_argument('--x-res', type=int, default=2048)
     argparser.add_argument('--y-res', type=int, default=1024) 
-    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/Exp/CARLA_gen20')
-    argparser.add_argument('--n-episode', type=int, default=8)
+    argparser.add_argument('--out-dir', type=str, default='/home/mli/Data/Exp/CARLA_gen20_town2')
+    argparser.add_argument('--n-episode', type=int, default=2)
     argparser.add_argument('--n-frame', type=int, default=200000)
     argparser.add_argument('--save-every-n-frames', type=int, default=20)
     argparser.add_argument('--cam-fov', type=float, default=50)
@@ -93,7 +93,8 @@ def run_carla_client(args):
     frames_per_episode = args.n_frame
 
     # n_weather = 14 # weathers starts from 1 
-    n_player_start_spots = 152
+    # n_player_start_spots = 152 # Town01
+    n_player_start_spots = 83 # Town02
 
     weathers = number_of_episodes*[2] # CloudyNoon
     start_spots = list(range(n_player_start_spots))

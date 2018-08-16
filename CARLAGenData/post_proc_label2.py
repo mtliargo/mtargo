@@ -62,9 +62,9 @@ single_mode = 0
 
 if single_mode:
     ## single mode
-    in_dir = join(data_dir, 'Exp/CARLA_gen20/e000003/SegRaw')
-    out_dir = mkdir2(join(data_dir, 'Exp/CARLA_gen20/e000003/Seg'))
-    mask_file = join(data_dir, 'Exp/CARLA_gen20/ego-vehicle.png')
+    in_dir = join(data_dir, 'Exp/CARLA_gen20_town2/e000003/SegRaw')
+    out_dir = mkdir2(join(data_dir, 'Exp/CARLA_gen20_town2/e000003/Seg'))
+    mask_file = join(data_dir, 'Exp/CARLA_gen20_town2/ego-vehicle.png')
 
     mask = np.array(Image.open(mask_file), dtype=bool)
 
@@ -80,10 +80,10 @@ if single_mode:
         img.save(join(out_dir, os.path.basename(f)))
 else:
 ## batch mode
-    mask_file = join(data_dir, 'Exp/CARLA_gen20/ego-vehicle.png')
+    mask_file = join(data_dir, 'Exp/CARLA_gen20_town2/ego-vehicle.png')
     mask = np.array(Image.open(mask_file), dtype=bool)
 
-    seqs = sorted(glob.glob(join(data_dir, 'Exp/CARLA_gen20/e*')))
+    seqs = sorted(glob.glob(join(data_dir, 'Exp/CARLA_gen20_town2/e*')))
     seqs = list(filter(lambda s: os.path.isdir(s), seqs))
 
     for s in seqs:
